@@ -44,6 +44,8 @@ class DetailTaskView(generics.RetrieveAPIView):
         instance = self.get_object()
         if not instance.completed:
             return Response({'condition': 'in_process'})
+        if len(instance.links.all()) == 0:
+            return Response({'error': 'no screenshots saved'})
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 

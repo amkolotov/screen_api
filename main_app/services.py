@@ -1,5 +1,5 @@
+import os
 import time
-from typing import Set
 from urllib.parse import urlparse, urljoin
 
 from django.conf import settings
@@ -75,7 +75,7 @@ def get_all_links(url: str, level: int, max_urls=990):
         get_all_links(link, level, max_urls=max_urls)
 
 
-def get_level_urls(url, level):
+def get_level_urls(url: str, level: int) -> list:
     """Функция, возвращающая адреса необходимого уровня"""
     get_all_links(url, level)
     level_urls = []
@@ -89,7 +89,10 @@ def get_level_urls(url, level):
 def get_driver():
     """Cоздание драйвера хром"""
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--disable-site-isolation-trials')
     driver = webdriver.Chrome(options=chrome_options)
     driver.set_window_size(1600, 900)
     return driver
@@ -100,22 +103,22 @@ def quit_driver(driver):
     driver.quit()
 
 
-def get_screen(driver, url, task_pk):
+def get_screen(driver, url: str, task_pk: str) -> str:
     """Создает скриншот страницы и возвращает путь до файла"""
     driver.get(url)
 
     element = driver.find_element_by_tag_name('body')
-    height = element.size["height"]
-    driver.set_window_size(1600, height)
+    # height = element.size["height"]
+    # driver.set_window_size(1600, height)
+    # driver.refresh()
 
-    driver.refresh()
     filename = f'{task_pk}:{str(datetime.utcnow())}.png'
-    filepath = f'{settings.MEDIA_ROOT}/{filename}'
+    filepath = os.path.join(settings.MEDIA_ROOT, filename)
     driver.save_screenshot(filepath)
     return filename
 
 
-def save_images(url, level):
+def save_images_loc(url: str, level: int) -> None:
     """Функция обработки основного запроса"""
     if level == 1:
         links = [url]
@@ -129,5 +132,5 @@ def save_images(url, level):
 
 
 if __name__ == '__main__':
-    save_images('http://xn--79-6kc3bfr2e.xn--80acgfbsl1azdqr.xn--p1ai/', 2)
+    save_images_loc('http://amkolotov.ru', 1)
 

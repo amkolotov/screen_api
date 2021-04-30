@@ -14,11 +14,15 @@ def save_images(url, level, task_pk):
         links = get_level_urls(url, level)
     task = Tasks.objects.filter(pk=task_pk).first()
     for link in links:
-        driver = get_driver()
-        image = get_screen(driver, link, task_pk)
-        Links.objects.create(task=task, link=link, image=image)
-        quit_driver(driver)
-        time.sleep(0.1)
+        try:
+            driver = get_driver()
+            image = get_screen(driver, link, task_pk)
+            Links.objects.create(task=task, link=link, image=image)
+            quit_driver(driver)
+            time.sleep(0.1)
+        except:
+            pass
     task.completed = True
     task.save()
+
 

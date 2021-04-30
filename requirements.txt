@@ -33,6 +33,7 @@ Pillow==8.2.0
 pipenv==2020.8.13
 prometheus-client==0.8.0
 prompt-toolkit==3.0.18
+psycopg2-binary==2.8.6
 pycosat==0.6.3
 pyparsing==2.4.7
 pytz==2021.1

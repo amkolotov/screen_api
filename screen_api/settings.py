@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = 'kaq=v@2!l(@n*9a=w2_z(p5_kuw5x*ltsmn+yh9=att_^laqqe'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'screen_api.wsgi.application'
 # }
 
 # REDIS related settings
-REDIS_HOST = 'localhost'
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 REDIS_PORT = '6379'
 BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}

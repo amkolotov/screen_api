@@ -1,0 +1,65 @@
+version: "3"
+
+services:
+
+  db:
+    container_name: screen_postgres
+    restart: always
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=screen_user
+      - POSTGRES_PASSWORD=screen_pass
+      - POSTGRES_DB=screen
+
+  web:
+    container_name: screen_api
+    restart: always
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      - DJANGO_SETTINGS_MODULE=screen_api.settings
+      - DB_HOST=screen_postgres
+      - DB_PORT=5432
+      - DB_NAME=screen
+      - DB_USER=screen_user
+      - DB_PASS=screen_pass
+      - REDIS_HOST=redis
+    command: >
+      sh -c "python3 manage.py migrate &&
+             python3 manage.py wait_db &&
+             python3 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - media_volume:/usr/src/app/media
+    depends_on:
+      - db
+
+  redis:
+    image: redis:alpine
+    container_name: screen_redis
+    restart: always
+
+  celery:
+    restart: always
+    container_name: screen_celery
+    build: .
+    command: celery -A screen_api worker -l info --concurrency=4
+    environment:
+      - DB_HOST=screen_postgres
+      - DB_PORT=5432
+      - DB_NAME=screen
+      - DB_USER=screen_user
+      - DB_PASS=screen_pass
+      - REDIS_HOST=redis
+    volumes:
+      - media_volume:/usr/src/app/media
+    depends_on:
+      - db
+      - redis
+      - web
+
+volumes:
+  postgres_data:
+  media_volume:
